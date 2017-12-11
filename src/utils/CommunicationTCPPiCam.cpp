@@ -30,7 +30,7 @@ qint64 CommunicationTCPPiCam::sendData(const QImage& img)
    QBuffer buffer;
    QDataStream stream(_socket);
    stream.setVersion(QDataStream::Qt_5_5);
-   img.save(&buffer, "BMP", 80);
+   img.save(&buffer, COM_TCP_IMG_TYPE, -1);
    QString id_string("V1.0_QIMAGE");
    stream << qint64(sizeof(id_string)) << id_string << qint64(buffer.size());
    _socket->write(buffer.data());
@@ -92,7 +92,7 @@ void CommunicationTCPPiCam::onNewData()
       array = _socket->read(payload_size);
       QImage img;
 
-      if(!img.loadFromData(array, "BMP"))
+      if(!img.loadFromData(array, COM_TCP_IMG_TYPE))
       {
          qDebug() << "READ IMG ERROR";
          return;
