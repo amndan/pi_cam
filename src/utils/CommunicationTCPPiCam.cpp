@@ -41,11 +41,13 @@ qint64 CommunicationTCPPiCam::sendData(const QImage& img)
 
 void CommunicationTCPPiCam::onNewData()
 {
+   qDebug() << "SocketSize:   " << _socket->size();
+
    qint64 payload_size;
 
    if(_socket->size() < (qint64) sizeof(payload_size))
    {
-      qDebug() << "size too less";
+      qDebug() << "transmission not yet complete";
       return;
    }
 
@@ -55,15 +57,12 @@ void CommunicationTCPPiCam::onNewData()
 
    stream >> payload_size;
 
-   qDebug() << "pls" << payload_size;
-
    payload_size += sizeof(payload_size);
 
    if(_socket->size() < payload_size)
    {
-      qDebug() << "size before1: " << _socket->size();
+      qDebug() << "transmission not yet complete --> rollback";
       stream.rollbackTransaction();
-      qDebug() << "size after1: " << _socket->size();
       return;
    }
 
@@ -73,10 +72,8 @@ void CommunicationTCPPiCam::onNewData()
 
    if(_socket->size() < payload_size)
    {
-      qDebug() << "size before2: " << _socket->size();
+      qDebug() << "transmission not yet complete --> rollback";
       stream.rollbackTransaction();
-      qDebug() << "size after2: " << _socket->size();
-      usleep(1000);
       return;
    }
 
@@ -108,11 +105,14 @@ void CommunicationTCPPiCam::onNewData()
       //      qDebug() << "img load " << img.load(_socket, "JPG");
       //      emit receivedQImage(img);
       //      qDebug() << "RECEIVED QIMAGE";
+
+      if(_socket->size())
+      {
+         this->onNewData();
+      }
    }
    else
    {
       _socket->read(payload_size);
    }
-
-
 }

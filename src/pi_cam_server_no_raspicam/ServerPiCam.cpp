@@ -1,11 +1,11 @@
 #include "ServerPiCam.h"
 
 ServerPiCam::ServerPiCam() :
-   _img("/tmp/test3.png")
+   _img("/home/amndan/tmp/grinsekatze.png")
 {
    _com.waitForIncommingConnection(QHostAddress::Any, 33749);
 
-   _update_timer.setInterval(50);
+   _update_timer.setInterval(100);
 
    //_com_debug.connectToWaitingServer("192.168.178.54", 33749);
 
@@ -21,11 +21,9 @@ ServerPiCam::~ServerPiCam()
 
 void ServerPiCam::updateImageData()
 {
-   static QImage img("/tmp/test3.png");
-
    qDebug() << "start send img with width: " << _img.width();
 
-   _com.sendData(img);
+   _com.sendData(_img);
 
    qDebug() << "end send img with width: " << _img.width();
 }
